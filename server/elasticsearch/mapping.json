@@ -1,0 +1,52 @@
+{
+    "properties": {
+      "poem_name": {
+        "type": "text",
+        "analyzer": "plain"
+      },
+      "poet": {
+        "type": "text",
+        "analyzer": "plain"
+      },
+      "published_year": {
+        "type": "date",
+        "format": "yyyy"
+      },
+  
+      "metaphor_line": {
+        "type": "text",
+        "analyzer": "plain"
+      },
+      "metaphor_line_stemmed": {
+        "type": "text",
+        "analyzer": "plain"
+      },
+  
+      "metaphor_terms": {
+        "type": "text",
+        "index": false
+      },
+  
+      "source_domain": {
+        "type": "text",
+        "analyzer": "plain"
+      },
+      "source_domain_stemmed": {
+        "type": "text",
+        "analyzer": "plain"
+      },
+      "target_domain": {
+        "type": "text",
+        "analyzer": "plain"
+      },
+      "target_domain_stemmed": {
+        "type": "text",
+        "analyzer": "plain"
+      },
+  
+      "interpretation": {
+        "type": "text",
+        "index": false
+      }
+    }
+  }

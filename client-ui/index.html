@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metaphor Search</title>
+    <!-- Include Axios library -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 50px;
+            background-color: #f0f0f0;
+        }
+
+        .configure {
+            margin-bottom: 50px;
+        }
+
+        .search {
+            display: flex;
+            gap: 20px;
+
+
+        }
+
+        #configure-button {
+
+            background-color: #0074d9;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #search-button {
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #0074d9;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            height: 40px;
+            border-radius: 10px;
+        }
+
+        #configure-button:hover {
+            background-color: #0056b3;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+        }
+
+        select {
+            padding: 10px;
+            margin: 10px 0;
+            width: 25%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 50%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="configure">
+        <button id="configure-button">Configure</button>
+    </div>
+    <div class="search-wrap">
+        <label for="search-select">Select search keyword:</label>
+        <select id="search-select">
+            <!-- Options will be populated using Axios -->
+        </select>
+        <div class="search">
+            <input type="text" id="search-input">
+            <button id="search-button">Search</button>
+        </div>
+        <div id="doc-count"></div>
+    </div>
+    <div id="dynamic-list"></div>
+
+    <script>
+
+        const searchButton = document.getElementById('search-button');
+        const dynamicList = document.getElementById('dynamic-list');
+        const searchInput = document.getElementById('search-input');
+        const searchSelect = document.getElementById('search-select');
+        const configureButton = document.getElementById('configure-button');
+        const docCount = document.getElementById('doc-count');
+
+        function getKeywords() {
+            axios.get('http://localhost:3000/search/keywords')
+                .then(function (response) {
+                    console.log(response)
+                    const data = response.data;
+
+                    data.forEach(function (item) {
+                        const option = document.createElement('option');
+                        option.text = item.value;
+                        option.value = item.key;
+                        searchSelect.appendChild(option);
+                    });
+                })
+                .catch(function (error) {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        function getData(data) {
+            axios.post('http://localhost:3000/search', data)
+                .then(function (response) {
+                    const data = response.data.data
+                    docCount.innerHTML = `Document count : ${response.data.count}`
+                    data.forEach(ele => {
+                        item = ele._source;
+                        const listItem = document.createElement('div');
+                        listItem.innerHTML = `<ul>
+                <li><strong>Poem: </strong> ${item.poem_name}</li>
+                <li><strong>Poet: </strong>${item.poet}</li>
+                <li><strong>Year: </strong>${item.year}</li>
+                <li><strong>Line: </strong>${item.line}
+                <li><strong>Metaphor:</strong> ${item.metaphor_term}</li>
+                <li><strong>Source domain: </strong>${item.source_domain}</li>
+                <li><strong>Target domain: </strong>${item.target_domain}</li>
+                <li><strong>Interpretation: </strong>${item.interpretation}</li>
+                `;
+                        dynamicList.appendChild(listItem);
+                    });
+                })
+        }
+
+        function configure() {
+            axios.post('http://localhost:3000/config/index', {})
+                .then(function (response) {
+                    console.log(response);
+                    alert('Configuration successfull')
+                    
+                })
+                .catch(function (error) {
+                    console.log(error)
+                    alert("Configuration Failed")
+                })
+        }
+
+
+        getKeywords();
+
+
+        searchButton.addEventListener('click', async function () {
+            dynamicList.innerHTML = '';
+            term = searchInput.value;
+            keyword = searchSelect.value;
+
+            getData({ "term": term, "keyword": keyword });
+
+        });
+
+        configureButton.addEventListener('click', function () {
+            configure();
+
+        });
+
+
+        populateSelectBox();
+    </script>
+</body>
+
+</html>
